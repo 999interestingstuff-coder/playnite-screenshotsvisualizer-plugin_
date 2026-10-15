@@ -1,0 +1,44 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore packages
+        run: nuget restore source/ScreenshotsVisualizer.sln
+
+      - name: Build (Release)
+        run: msbuild source/ScreenshotsVisualizer.csproj /p:Configuration=Release /p:Platform=AnyCPU /restore /v:m
+
+      - name: Package .pext
+        shell: pwsh
+        run: |
+          $out = "source/bin/Release"
+          $version = ((Get-Content source/extension.yaml | Select-String '^Version:').Line -split ':')[1].Trim()
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          $zip = "dist/ScreenshotsVisualizer_$version.zip"
+          Compress-Archive -Path "$out/*" -DestinationPath $zip -Force
+          Copy-Item $zip "dist/ScreenshotsVisualizer_$version.pext" -Force
+          Get-ChildItem dist
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ScreenshotsVisualizer
+          path: dist/*
