@@ -51,7 +51,7 @@ namespace ScreenshotsVisualizer.Services
             pattern = pattern.Replace("\\{DateTimeModified\\}", @"[0-9]{4}[-_][0-9]{2}[-_][0-9]{2}[ -_][0-9]{2}[-_][0-9]{2}[-_][0-9]{2}");
 
             string gameName = API.Instance.ExpandGameVariables(game, "{Name}");
-            string safeGameNamePattern = PathValidator.GetSafePathName(gameName).Replace(" ", "[ ]*");
+            string safeGameNamePattern = PathValidator.GetSafePathName(gameName).Replace(" ", "[ _]*");
             pattern = pattern.Replace(gameName, safeGameNamePattern);
             return "^" + pattern + "$";
         }
