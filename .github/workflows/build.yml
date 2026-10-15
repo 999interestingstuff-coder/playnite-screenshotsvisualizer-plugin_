@@ -24,7 +24,7 @@ jobs:
         run: nuget restore source/ScreenshotsVisualizer.sln
 
       - name: Build (Release)
-        run: msbuild source/ScreenshotsVisualizer.csproj /p:Configuration=Release /p:Platform=AnyCPU /restore /v:m
+        run: msbuild source/ScreenshotsVisualizer.sln /p:Configuration=Release /p:Platform="Any CPU" /v:m
 
       - name: Package .pext
         shell: pwsh
